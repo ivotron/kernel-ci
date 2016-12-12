@@ -347,10 +347,12 @@ function Build()
   time fakeroot make-kpkg --jobs "$(getconf _NPROCESSORS_ONLN)" --append-to-version "$VERSION_POSTFIX" --initrd kernel_headers
   popd
 
+  pushd $SRC_DIR
   PACKAGE_NAME="$(ls -m1 linux-image*.deb)"
   HEADERS_PACKAGE_NAME="$(ls -m1 linux-headers*.deb)"
   echo "Congratulations! You just build a linux kernel."
   echo "Use the following command to install it: dpkg -i $PACKAGE_NAME $HEADERS_PACKAGE_NAME"
+  popd
 }
 
 # Generates MD5sum of package
@@ -416,7 +418,7 @@ ApplyPatches() {
     rm -f ./linux-"$KERNEL_VERSION"/patches/dirtyCOW.patch
   fi
 
-  if [ ! -d "patches/" ] || [ -n "$(ls -A patches/*)" ]; then
+  if [ ! -d "patches/" ] || [ `ls -l patches/ | grep ".patch$" | wc -l` -eq 0 ]; then
     echo "No patches detected in patches/ folder"
   else
     echo "Detected Patches"
